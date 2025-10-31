@@ -4,18 +4,16 @@ import {
   toMultichainNexusAccount,
   getMEEVersion,
   MEEVersion,
-  getMeeScanLink,
   type MeeClient,
   type MultichainSmartAccount,
 } from "@biconomy/abstractjs";
 import { useAccount, useWalletClient } from "wagmi";
 import { polygon } from "viem/chains";
-import { http, createWalletClient, custom, erc20Abi } from "viem";
+import { http, createWalletClient, custom } from "viem";
 
 export const useBiconomy = () => {
   const [meeClient, setMeeClient] = useState<MeeClient | null>(null);
-  const [orchestrator, setOrchestrator] =
-    useState<MultichainSmartAccount | null>(null);
+  const [orchestrator, setOrchestrator] = useState<MultichainSmartAccount | null>(null);
   const [loading, setLoading] = useState(false);
   const { address, isConnected } = useAccount();
   const { data: walletClient } = useWalletClient();
@@ -31,7 +29,6 @@ export const useBiconomy = () => {
 
   const initBiconomy = async () => {
     if (!walletClient || !address) return;
-
     setLoading(true);
     try {
       const viemWalletClient = createWalletClient({
@@ -40,7 +37,6 @@ export const useBiconomy = () => {
         transport: custom((window as any).ethereum),
       });
 
-      // Create multichain nexus account
       const multiAccount = await toMultichainNexusAccount({
         chainConfigurations: [
           {
@@ -52,7 +48,6 @@ export const useBiconomy = () => {
         signer: viemWalletClient,
       });
 
-      // Create MEE client
       const mee = await createMeeClient({
         account: multiAccount,
         apiKey: import.meta.env.VITE_BICONOMY_API_KEY,
@@ -60,7 +55,7 @@ export const useBiconomy = () => {
 
       setOrchestrator(multiAccount);
       setMeeClient(mee);
-      console.log("✅ Biconomy initialized successfully");
+      console.log("✅ Biconomy initialized successfully with sponsorship support");
     } catch (error) {
       console.error("❌ Biconomy initialization failed:", error);
     } finally {
